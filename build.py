@@ -14,7 +14,8 @@ def item_body(ids,target):
  return 'local items={\n'+''.join('{%d,"%s",%d},\n'%(i,name(i),target) for i in ids)+'}\n'+(SRC/'items.lua').read_text()
 entries=[('Level99','全隊 Lv99（正常升級成長，保留職業）',(SRC/'level99.lua').read_text()),
  ('TopEquipment','畢業裝備包：29 種各補至 4 件（加入背包）',item_body(ids,4)),
- ('Elixir99','萬靈藥補至 99 個',item_body([8],99))]
+ ('Elixir99','萬靈藥補至 99 個',item_body([8],99)),
+ ('Gil1000000','金錢設為 1,000,000 Gil',(SRC/'gil1000000.lua').read_text())]
 def create(entries,path):
  root=E.Element('CheatTable',CheatEngineTableVersion='45');es=E.SubElement(root,'CheatEntries')
  for i,(key,title,body) in enumerate(entries,1):
@@ -25,4 +26,4 @@ def create(entries,path):
  E.SubElement(root,'UserdefinedSymbols');E.indent(root);E.ElementTree(root).write(path,encoding='utf-8',xml_declaration=True)
 create(entries,OUT/'FF1_PR_20249397.CT')
 for e in entries:create([e],OUT/('FF1_PR_'+e[0]+'_20249397.CT'))
-print('Built combined CT and 3 independent CTs; 29 equipment types; build 20249397')
+print('Built combined CT and 4 independent CTs; 29 equipment types; build 20249397')
