@@ -1,15 +1,17 @@
-local target=1000000
-local before=g(u,'get_OwendGil')
-assert(type(before)=='number' and before==math.floor(before) and before>=0 and before<=9999999,'Invalid Gil')
-local ic=cls('Last.Management','OwnedItemClient')
-local add=meth(ic,'AddGil','System.Int32')
-local remove=meth(ic,'RemoveGil','System.Int32')
-print('GIL PLAN',before,'->',target)
-if not FF1_READ_ONLY then
- local client=instance('Last.Management','OwnedItemClient')
- assert(g(u,'get_OwendGil')==before,'Gil changed; stop on the map and retry')
- if before<target then call(add,client,{target-before})
- elseif before>target then call(remove,client,{before-target}) end
- assert(g(u,'get_OwendGil')==target,'Gil verification failed')
- print('GIL VERIFIED',before,'->',target)
+local function field(c,n)
+ for _,f in ipairs(mono_class_enumFields(c,true) or {}) do if f.name==n then return f end end
+ error('Missing field '..n)
 end
+local sf=field(um,'saveData')
+local save=readPointer(u+sf.offset)
+local sc=cls('Last.Data.User','UserSaveData')
+assert(save and save>65536 and readPointer(save)==sc,'Invalid save data')
+local gf=field(sc,'owendGil');assert(gf.typename=='System.Int32','Invalid Gil field type')
+local address=save+gf.offset
+local before=readInteger(address)
+assert(before and before>=0 and before<=9999999,'Invalid Gil')
+if not FF1_READ_ONLY then
+ assert(writeInteger(address,1000000),'Gil write failed')
+ assert(readInteger(address)==1000000 and g(u,'get_OwendGil')==1000000,'Gil verification failed')
+end
+print('GIL VERIFIED',before,'->',readInteger(address))
